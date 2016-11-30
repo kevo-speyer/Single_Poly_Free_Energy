@@ -1,0 +1,8 @@
+3       n_dim
+100.    Lx box
+900000000  n_time
+32      n_mon
+0.5     a_box
+1.       Rend2
+1.      Temp
+1000000   n_save
