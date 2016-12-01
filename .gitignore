@@ -6,4 +6,11 @@ fort.81
 log
 random_seed.dat
 ziggurat.mod
+runs/
+tags
+Free_Energy_vs_Rx.dat
+com_vars.mod
+init_positions.dat
+last_config.dat
+rend_histo.dat
 

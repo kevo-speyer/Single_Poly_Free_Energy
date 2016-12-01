@@ -4,6 +4,6 @@
 
 #undef SLIP_LINK /*Add Slip Link: anchor points with springs attached to random beads of the polymer*/
 
-#define FREE_ENERGY_A
+#define FREE_ENERGY 2 /* 1 = A method for calculating free energy*/
+                      /* 2 = B method for calculating free energy*/
 
-#undef FREE_ENERGY_B

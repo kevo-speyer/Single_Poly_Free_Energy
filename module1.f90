@@ -27,10 +27,14 @@ real(kind=8) :: sl_sp_ener, delta_sl_sp_ener,  k_sl_sp, std_dev  !Total slip-lin
 logical :: rej_mv
 #endif
 
-#ifdef  FREE_ENERGY_A
+#if  FREE_ENERGY == 1
 integer :: n_bins, histo_count
 real(kind=8) :: x_max, dx_bin
 real(kind=8), dimension(:), allocatable :: histo_rend
+#elif FREE_ENERGY == 2
+real(kind=8), dimension(:), allocatable :: f_ext
+
 #endif
+
 end module com_vars
  

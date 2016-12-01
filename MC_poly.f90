@@ -67,7 +67,8 @@ do i_time = 1, n_time
     
 #endif
 
-#ifdef  FREE_ENERGY_A
+
+#if FREE_ENERGY == 1
     call rend_histo()
 #endif
 
@@ -80,7 +81,8 @@ end do ! End time loop
 
 call save_positions()
 
-#ifdef  FREE_ENERGY_A
+#if FREE_ENERGY == 1
+
     call save_rend_histo()
 #endif
 
@@ -105,7 +107,8 @@ end program
 
 
 subroutine rend_histo()
-#ifdef  FREE_ENERGY_A
+#if FREE_ENERGY == 1
+
 use com_vars
 implicit none
 integer :: i_x, i_y, i_z
@@ -118,10 +121,10 @@ i_z = int( ( r0(3,n_mon) - r0(3,1) ) / x_max  * float(n_bins) )
 !print*, i_x, r0(1,n_mon) - r0(1,1),  
  
 if( i_x .ge. 0 ) then
-    if( (i_y*i_y .eq. 0) .and. (i_z*i_z .eq.0) ) then !Rend_y = Rend_z = 0
+    !if( (i_y*i_y .eq. 0) .and. (i_z*i_z .eq.0) ) then !Rend_y = Rend_z = 0
         histo_count = histo_count + 1
         histo_rend(i_x) = histo_rend(i_x) + 1. 
-    end if
+    !end if
 end if
 
 #endif
@@ -169,7 +172,8 @@ end subroutine
 
 subroutine save_rend_histo()
 #include "prepro.h"
-#ifdef FREE_ENERGY_A
+#if FREE_ENERGY == 1
+
 use com_vars
 implicit none
 integer :: i_bin
@@ -560,6 +564,15 @@ end if
 
 #endif
 
+#if FREE_ENERGY == 2
+if (mv_mon .eq. 1) then
+    delta_energy = delta_energy + sum( f_ext(:) * ( r0(:,n_mon) - r0(:,1) -  dr_mv(:))) 
+    delta_energy = delta_energy - sum( f_ext(:) * ( r0(:,n_mon) - r0(:,1) ))
+else if (mv_mon .eq. n_mon) then
+    delta_energy = delta_energy + sum( f_ext(:) * ( r0(:,n_mon) +  dr_mv(:) - r0(:,1) )) 
+    delta_energy = delta_energy - sum( f_ext(:) * ( r0(:,n_mon) - r0(:,1) )) 
+end if
+#endif
 !print*,delta_energy
 end subroutine
 
@@ -576,6 +589,11 @@ end do
 
 energy = energy * 0.5
 
+#if FREE_ENERGY == 2
+
+energy = energy + sum( f_ext(:) * ( r0(:,n_mon) - r0(:,1)))
+
+#endif
 !write(61,*) energy
 end subroutine
 
@@ -623,9 +641,9 @@ k_spr = 3. * ( float( n_mon ) - 1. ) / Rend2
     allocate( anch_r0(n_dim,n_anchor) )  
 #endif anchor
 
-#ifdef FREE_ENERGY_A
+#if FREE_ENERGY == 1
 x_max = 4.
-n_bins = 30
+n_bins = 60
 histo_count = 0
 dx_bin = x_max / float(n_bins)
 allocate( histo_rend(0:n_bins) )
@@ -749,6 +767,11 @@ implicit none
 open (unit = 53, file = "input.dat", status= "old")
 
 read(53,*) n_dim
+
+#if FREE_ENERGY == 2
+allocate(f_ext(n_dim))
+#endif
+
 read(53,*) Lx !, Ly, Lz Square box
 read(53,*) n_time
 read(53,*) n_mon
@@ -756,6 +779,12 @@ read(53,*) a_box
 read(53,*) Rend2
 read(53,*) Temp
 read(53,*) n_save
+
+#if FREE_ENERGY == 2
+read(53,*) f_ext(:)
+print*, "Simulating with external force f_ext =", f_ext
+#endif
+
 close(53)
 
 end subroutine
